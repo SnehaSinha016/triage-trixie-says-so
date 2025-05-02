@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -61,34 +62,79 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
-				}
+				},
+				mint: '#8ED1B7',
+				coral: '#FFA69E',
+				yellow: '#FDFD96',
+				skyblue: '#A2D2FF',
+				warning: '#FFB347',
+				danger: '#FF6B6B',
+				success: '#77DD77',
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
 				md: 'calc(var(--radius) - 2px)',
 				sm: 'calc(var(--radius) - 4px)'
 			},
+			fontFamily: {
+				nunito: ['Nunito', 'sans-serif'],
+			},
 			keyframes: {
-				'accordion-down': {
-					from: {
-						height: '0'
+				"accordion-down": {
+					from: { height: "0", opacity: "0" },
+					to: { height: "var(--radix-accordion-content-height)", opacity: "1" }
+				},
+				"accordion-up": {
+					from: { height: "var(--radix-accordion-content-height)", opacity: "1" },
+					to: { height: "0", opacity: "0" }
+				},
+				"fade-in": {
+					"0%": {
+						opacity: "0",
+						transform: "translateY(10px)"
 					},
-					to: {
-						height: 'var(--radix-accordion-content-height)'
+					"100%": {
+						opacity: "1",
+						transform: "translateY(0)"
 					}
 				},
-				'accordion-up': {
-					from: {
-						height: 'var(--radix-accordion-content-height)'
+				"bounce-in": {
+					"0%": {
+						opacity: "0",
+						transform: "scale(0.95)"
 					},
-					to: {
-						height: '0'
+					"70%": {
+						transform: "scale(1.05)"
+					},
+					"100%": {
+						opacity: "1",
+						transform: "scale(1)"
+					}
+				},
+				"pulse-soft": {
+					"0%, 100%": {
+						opacity: "1"
+					},
+					"50%": {
+						opacity: "0.8"
+					}
+				},
+				"float": {
+					"0%, 100%": {
+						transform: "translateY(0)"
+					},
+					"50%": {
+						transform: "translateY(-5px)"
 					}
 				}
 			},
 			animation: {
-				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				"accordion-down": "accordion-down 0.2s ease-out",
+				"accordion-up": "accordion-up 0.2s ease-out",
+				"fade-in": "fade-in 0.5s ease-out",
+				"bounce-in": "bounce-in 0.5s ease-out",
+				"pulse-soft": "pulse-soft 3s infinite ease-in-out",
+				"float": "float 3s infinite ease-in-out"
 			}
 		}
 	},
