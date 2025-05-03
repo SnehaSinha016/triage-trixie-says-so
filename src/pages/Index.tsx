@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import TrixieAvatar from '../components/TrixieAvatar';
@@ -12,6 +11,8 @@ import LoadingDots from '../components/LoadingDots';
 import PrivacyNote from '../components/PrivacyNote';
 import SelfCareTip from '../components/SelfCareTip';
 import CrisisResources from '../components/CrisisResources';
+import SelfCareToolbox from '../components/SelfCareToolbox';
+import MoodJournal from '../components/MoodJournal';
 import { Button } from '@/components/ui/button';
 import { symptoms } from '../data/symptoms';
 import { Question, questionsBySymptom } from '../data/questions';
@@ -39,6 +40,8 @@ const Index = () => {
   const [isThinking, setIsThinking] = useState(false);
   const [showSelfCareTip, setShowSelfCareTip] = useState(false);
   const [showCrisisResources, setShowCrisisResources] = useState(false);
+  const [showSelfCareToolbox, setShowSelfCareToolbox] = useState(false);
+  const [showMoodJournal, setShowMoodJournal] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -295,6 +298,8 @@ const Index = () => {
                 isMentalHealth={selectedSymptom?.id === 'mental-health'}
                 onSelfCare={() => setShowSelfCareTip(true)}
                 onTalkToSomeone={() => setShowCrisisResources(true)}
+                onToolbox={() => setShowSelfCareToolbox(true)}
+                onMoodJournal={() => setShowMoodJournal(true)}
               />
               
               <div className="flex flex-col gap-4 mt-8">
@@ -330,6 +335,14 @@ const Index = () => {
         
         {showCrisisResources && (
           <CrisisResources onClose={() => setShowCrisisResources(false)} />
+        )}
+        
+        {showSelfCareToolbox && (
+          <SelfCareToolbox onClose={() => setShowSelfCareToolbox(false)} />
+        )}
+        
+        {showMoodJournal && (
+          <MoodJournal onClose={() => setShowMoodJournal(false)} />
         )}
       </AnimatePresence>
     </div>

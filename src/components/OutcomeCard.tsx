@@ -13,6 +13,8 @@ type OutcomeCardProps = {
   compassionateWord?: string;
   onSelfCare?: () => void;
   onTalkToSomeone?: () => void;
+  onToolbox?: () => void;
+  onMoodJournal?: () => void; // Added new prop
   isMentalHealth?: boolean;
 };
 
@@ -26,6 +28,8 @@ const OutcomeCard = ({
   compassionateWord, 
   onSelfCare,
   onTalkToSomeone,
+  onToolbox,
+  onMoodJournal, // Added new prop
   isMentalHealth = false
 }: OutcomeCardProps) => {
   const typeClasses = {
@@ -68,7 +72,7 @@ const OutcomeCard = ({
         </motion.div>
       )}
 
-      {isMentalHealth && (type === 'warning' || type === 'danger') && (
+      {(isMentalHealth || type === 'warning' || type === 'danger') && (
         <div className="flex flex-col gap-2 mt-4 w-full">
           {onTalkToSomeone && (
             <button 
@@ -85,6 +89,24 @@ const OutcomeCard = ({
               className="bg-gradient-to-r from-purple-500 to-purple-600 text-white font-semibold py-3 px-4 rounded-lg flex items-center justify-center gap-2"
             >
               <span className="text-xl">🧘</span> Try a Self-Care Tip
+            </button>
+          )}
+          
+          {onToolbox && (
+            <button 
+              onClick={onToolbox}
+              className="bg-gradient-to-r from-teal-500 to-teal-600 text-white font-semibold py-3 px-4 rounded-lg flex items-center justify-center gap-2"
+            >
+              <span className="text-xl">🧰</span> Open Self-Care Toolbox
+            </button>
+          )}
+          
+          {onMoodJournal && (
+            <button 
+              onClick={onMoodJournal}
+              className="bg-gradient-to-r from-indigo-500 to-indigo-600 text-white font-semibold py-3 px-4 rounded-lg flex items-center justify-center gap-2"
+            >
+              <span className="text-xl">📓</span> Track Your Mood
             </button>
           )}
         </div>
