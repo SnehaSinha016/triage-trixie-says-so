@@ -10,13 +10,16 @@ import BotMessage from '../components/BotMessage';
 import UserMessage from '../components/UserMessage';
 import LoadingDots from '../components/LoadingDots';
 import PrivacyNote from '../components/PrivacyNote';
+import SelfCareTip from '../components/SelfCareTip';
+import CrisisResources from '../components/CrisisResources';
 import { Button } from '@/components/ui/button';
 import { symptoms } from '../data/symptoms';
 import { Question, questionsBySymptom } from '../data/questions';
 import { evaluateTriage, TriageResult } from '../utils/triageLogic';
-import { logTriageSession } from '../services/supabaseClient';
+import { logTriageSession, logMentalHealthSession } from '../services/supabaseClient';
 import { useToast } from '../hooks/use-toast';
 import { ArrowRight } from 'lucide-react';
+import { getRandomCompassionateWord, physicalHealthWords, mentalHealthWords } from '../data/compassionateWords';
 
 type ChatStep = 
   | 'welcome'
@@ -34,6 +37,8 @@ const Index = () => {
   const [answers, setAnswers] = useState<Record<string, string | number | boolean>>({});
   const [outcome, setOutcome] = useState<TriageResult | null>(null);
   const [isThinking, setIsThinking] = useState(false);
+  const [showSelfCareTip, setShowSelfCareTip] = useState(false);
+  const [showCrisisResources, setShowCrisisResources] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -77,19 +82,45 @@ const Index = () => {
             answers
           });
           
+          // Add compassionate word for warning or danger outcomes
+          if (result.outcome === 'warning' || result.outcome === 'danger') {
+            const wordsList = selectedSymptom.id === 'mental-health' 
+              ? mentalHealthWords 
+              : physicalHealthWords;
+            
+            result.compassionateWord = getRandomCompassionateWord(wordsList);
+          }
+          
           setOutcome(result);
           setCurrentStep('outcome');
           setIsThinking(false);
           
-          // Log the triage session to Supabase
-          logTriageSession({
-            symptom: selectedSymptom.id,
-            answers,
-            outcome: result.outcome,
-            timestamp: new Date().toISOString()
-          }).catch(err => {
-            console.error("Failed to log session:", err);
-          });
+          // Log the session to Supabase
+          if (selectedSymptom.id === 'mental-health') {
+            logMentalHealthSession({
+              mood: answers['mental-health-mood'] as string,
+              anxiety: answers['mental-health-anxiety'] as string,
+              sleep_issues: answers['mental-health-sleep'] as string,
+              duration: answers['mental-health-duration'] as string,
+              self_harm_thoughts: answers['mental-health-thoughts'] as string,
+              outcome: result.outcome,
+              timestamp: new Date().toISOString(),
+              compassionateWord: result.compassionateWord
+            }).catch(err => {
+              console.error("Failed to log mental health session:", err);
+            });
+          } else {
+            logTriageSession({
+              symptom: selectedSymptom.id,
+              answers,
+              outcome: result.outcome,
+              condition: result.condition,
+              compassionateWord: result.compassionateWord,
+              timestamp: new Date().toISOString()
+            }).catch(err => {
+              console.error("Failed to log session:", err);
+            });
+          }
         }
       }, 2000);
     }
@@ -191,7 +222,11 @@ const Index = () => {
             >
               <ChatContainer>
                 <BotMessage>
-                  <p className="mb-2">Hi there! 👋 I see you're having issues with <span className="font-bold">{selectedSymptom.name}</span> {selectedSymptom.emoji}</p>
+                  {selectedSymptom.id === 'mental-health' ? (
+                    <p className="mb-2">Thank you for sharing with me 💚 Let's talk about how you've been feeling lately.</p>
+                  ) : (
+                    <p className="mb-2">Hi there! 👋 I see you're having issues with <span className="font-bold">{selectedSymptom.name}</span> {selectedSymptom.emoji}</p>
+                  )}
                   <p>Let me ask you a few questions to understand better.</p>
                 </BotMessage>
                 
@@ -255,15 +290,22 @@ const Index = () => {
                 emoji={outcome.emoji}
                 description={outcome.description}
                 explanation={outcome.explanation}
+                condition={outcome.condition}
+                compassionateWord={outcome.compassionateWord}
+                isMentalHealth={selectedSymptom?.id === 'mental-health'}
+                onSelfCare={() => setShowSelfCareTip(true)}
+                onTalkToSomeone={() => setShowCrisisResources(true)}
               />
               
               <div className="flex flex-col gap-4 mt-8">
-                <Button 
-                  onClick={handleAskDoctor}
-                  className="bg-skyblue hover:bg-skyblue/80 text-white font-semibold py-6 rounded-xl flex items-center justify-center gap-2"
-                >
-                  Ask a Doctor 👨‍⚕️
-                </Button>
+                {selectedSymptom?.id !== 'mental-health' && (
+                  <Button 
+                    onClick={handleAskDoctor}
+                    className="bg-skyblue hover:bg-skyblue/80 text-white font-semibold py-6 rounded-xl flex items-center justify-center gap-2"
+                  >
+                    Ask a Doctor 👨‍⚕️
+                  </Button>
+                )}
                 
                 <Button
                   onClick={handleRestart}
@@ -279,6 +321,17 @@ const Index = () => {
           )}
         </AnimatePresence>
       </main>
+
+      {/* Modals */}
+      <AnimatePresence>
+        {showSelfCareTip && (
+          <SelfCareTip onClose={() => setShowSelfCareTip(false)} />
+        )}
+        
+        {showCrisisResources && (
+          <CrisisResources onClose={() => setShowCrisisResources(false)} />
+        )}
+      </AnimatePresence>
     </div>
   );
 };

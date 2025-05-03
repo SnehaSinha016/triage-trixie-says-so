@@ -1,4 +1,3 @@
-
 type TriageAnswers = {
   symptomId: string;
   answers: Record<string, string | number | boolean>;
@@ -10,6 +9,8 @@ export type TriageResult = {
   emoji: string;
   description: string;
   explanation: string;
+  condition?: string;
+  compassionateWord?: string;
 };
 
 // High-risk combinations that need urgent care
@@ -50,6 +51,13 @@ const redFlags: Record<string, (answers: Record<string, string | number | boolea
     return (
       answers['rash-other-symptoms'] === 'breathing' ||
       answers['rash-other-symptoms'] === 'swelling'
+    );
+  },
+  'mental-health': (answers) => {
+    // Critical mental health red flags - suicidal thoughts or severe depression
+    return (
+      answers['mental-health-thoughts'] === 'yes' ||
+      (answers['mental-health-mood'] === 'very-low' && answers['mental-health-duration'] === 'weeks')
     );
   }
 };
@@ -107,6 +115,14 @@ const warningFlags: Record<string, (answers: Record<string, string | number | bo
       answers['injury-type'] === 'burn' ||
       answers['injury-other-symptoms'] === 'numbness'
     );
+  },
+  'mental-health': (answers) => {
+    // Warning mental health flags - persistent anxiety, sleep issues
+    return (
+      answers['mental-health-anxiety'] === 'often' ||
+      answers['mental-health-sleep'] === 'significant' ||
+      answers['mental-health-mood'] === 'low'
+    );
   }
 };
 
@@ -134,7 +150,8 @@ function generateDangerOutcome(symptomId: string, answers: Record<string, string
       title: 'Please seek urgent medical care',
       emoji: '🚨',
       description: 'These chest pain symptoms need immediate attention.',
-      explanation: "Chest pain with breathing difficulty or that radiates to your arm, jaw, or back could be signs of a serious heart condition. It's best to get this checked right away, honey!"
+      explanation: "Chest pain with breathing difficulty or that radiates to your arm, jaw, or back could be signs of a serious heart condition. It's best to get this checked right away, honey!",
+      condition: "Possible heart-related condition"
     },
     headache: {
       outcome: 'danger',
@@ -168,6 +185,14 @@ function generateDangerOutcome(symptomId: string, answers: Record<string, string
       description: 'Your rash symptoms need immediate attention.',
       explanation: "A rash with breathing difficulties or facial swelling could indicate a severe allergic reaction. This requires immediate medical attention!"
     },
+    'mental-health': {
+      outcome: 'danger',
+      title: 'Please reach out right now',
+      emoji: '🚨',
+      description: 'You matter and we\'re with you ❤️',
+      explanation: "Having thoughts of giving up or persistent severe low mood are serious signs your mind needs immediate support. Please connect with a mental health professional today - you deserve care and there are people who want to help.",
+      condition: "Possible severe depression or crisis"
+    },
     // Default response if no specific match
     default: {
       outcome: 'danger',
@@ -188,7 +213,8 @@ function generateWarningOutcome(symptomId: string, answers: Record<string, strin
       title: 'Best to call a doctor soon',
       emoji: '⚠️',
       description: 'Your chest pain should be evaluated by a healthcare provider.',
-      explanation: "While this doesn't seem immediately life-threatening, chest pain should always be checked out. Try to get an appointment in the next day or so!"
+      explanation: "While this doesn't seem immediately life-threatening, chest pain should always be checked out. Try to get an appointment in the next day or so!",
+      condition: "Possible musculoskeletal pain or mild heart issue"
     },
     headache: {
       outcome: 'warning',
@@ -241,6 +267,14 @@ function generateWarningOutcome(symptomId: string, answers: Record<string, strin
       description: 'Your injury should be evaluated.',
       explanation: "Moderate injuries, burns, or injuries with numbness should be properly assessed. No need to tough this one out alone!"
     },
+    'mental-health': {
+      outcome: 'warning',
+      title: 'Talking to someone might really help',
+      emoji: '⚠️',
+      description: "You're not alone 💬",
+      explanation: "It sounds like you've been going through a tough time with your mental health. Speaking with a counselor or therapist could provide valuable support and coping strategies. Your feelings are valid and deserve attention.",
+      condition: "Possible anxiety or mild depression"
+    },
     // Default response if no specific match
     default: {
       outcome: 'warning',
@@ -261,7 +295,8 @@ function generateSuccessOutcome(symptomId: string, answers: Record<string, strin
       title: "You're probably okay",
       emoji: '✅',
       description: 'Monitor your symptoms at home.',
-      explanation: "Mild chest discomfort without other concerning symptoms can often be due to muscle strain or mild heartburn. Rest and take it easy, but if anything changes, don't hesitate to reach out for help!"
+      explanation: "Mild chest discomfort without other concerning symptoms can often be due to muscle strain or mild heartburn. Rest and take it easy, but if anything changes, don't hesitate to reach out for help!",
+      condition: "Likely muscle strain or mild indigestion"
     },
     headache: {
       outcome: 'success',
@@ -311,6 +346,14 @@ function generateSuccessOutcome(symptomId: string, answers: Record<string, strin
       emoji: '✅',
       description: 'Rest and care for your injury at home.',
       explanation: "Minor cuts, scrapes, or strains can typically be managed at home. Clean wounds with soap and water, apply antibiotic ointment and bandages. For strains, remember RICE: Rest, Ice, Compression, and Elevation!"
+    },
+    'mental-health': {
+      outcome: 'success',
+      title: "Rough patch? You've got this 💛",
+      emoji: '✅',
+      description: 'Take it slow today.',
+      explanation: "Everyone has ups and downs, and it sounds like you're managing yours well. Keep up your self-care routine, and remember that it's always okay to reach out if things change.",
+      condition: "Normal life stressors"
     },
     // Default response if no specific match
     default: {

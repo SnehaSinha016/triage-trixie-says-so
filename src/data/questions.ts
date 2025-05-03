@@ -1,4 +1,3 @@
-
 import { Answer } from '../components/AnswerOption';
 
 export type Question = {
@@ -272,6 +271,56 @@ export const questionsBySymptom: Record<string, Question[]> = {
         { id: 'dizziness', text: 'Dizziness', emoji: '😵', value: 'dizziness' },
         { id: 'nausea', text: 'Nausea or vomiting', emoji: '🤢', value: 'nausea' },
         { id: 'numbness', text: 'Numbness or tingling', emoji: '🥴', value: 'numbness' },
+      ],
+    },
+  ],
+  'mental-health': [
+    {
+      id: 'mental-health-mood',
+      text: 'How have your spirits been lately? 💭',
+      answers: [
+        { id: 'good', text: 'Pretty good overall', emoji: '😊', value: 'good' },
+        { id: 'okay', text: 'Up and down', emoji: '😐', value: 'okay' },
+        { id: 'low', text: 'Feeling down most days', emoji: '😔', value: 'low' },
+        { id: 'very-low', text: 'Very low, nothing brings joy', emoji: '😞', value: 'very-low' },
+      ],
+    },
+    {
+      id: 'mental-health-anxiety',
+      text: 'Have you felt anxious or overwhelmed? 😰',
+      answers: [
+        { id: 'rarely', text: 'Rarely or never', emoji: '😌', value: 'rarely' },
+        { id: 'sometimes', text: 'Sometimes, but manageable', emoji: '😅', value: 'sometimes' },
+        { id: 'often', text: 'Often, affecting daily life', emoji: '😥', value: 'often' },
+        { id: 'constant', text: 'Constant, overwhelming feeling', emoji: '😩', value: 'constant' },
+      ],
+    },
+    {
+      id: 'mental-health-sleep',
+      text: 'Any trouble sleeping lately? 😴',
+      answers: [
+        { id: 'normal', text: 'Sleeping normally', emoji: '💤', value: 'normal' },
+        { id: 'mild', text: 'Some trouble, but getting by', emoji: '🛏️', value: 'mild' },
+        { id: 'significant', text: 'Significant sleep problems', emoji: '🌙', value: 'significant' },
+        { id: 'severe', text: 'Severe insomnia or sleeping too much', emoji: '⏰', value: 'severe' },
+      ],
+    },
+    {
+      id: 'mental-health-duration',
+      text: 'How long have you felt this way? ⏱️',
+      answers: [
+        { id: 'days', text: 'Just a few days', emoji: '📅', value: 'days' },
+        { id: 'weeks', text: 'Several weeks', emoji: '📆', value: 'weeks' },
+        { id: 'months', text: 'Months or longer', emoji: '🗓️', value: 'months' },
+      ],
+    },
+    {
+      id: 'mental-health-thoughts',
+      text: 'Have you had thoughts of giving up? 💔',
+      answers: [
+        { id: 'no', text: 'No, not at all', emoji: '💪', value: 'no' },
+        { id: 'passive', text: 'Passing thoughts, but no plans', emoji: '🤔', value: 'passive' },
+        { id: 'yes', text: 'Yes, these thoughts concern me', emoji: '😢', value: 'yes' },
       ],
     },
   ]

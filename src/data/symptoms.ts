@@ -50,4 +50,11 @@ export const symptoms: Symptom[] = [
     emoji: '🩹', 
     description: 'Cuts, sprains, or possible breaks?' 
   },
+  { 
+    id: 'mental-health', 
+    name: 'Mental Health', 
+    emoji: '🧠', 
+    description: 'Feeling down, anxious, or overwhelmed?',
+    highlight: true
+  },
 ];

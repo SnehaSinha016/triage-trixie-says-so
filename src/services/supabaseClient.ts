@@ -13,6 +13,8 @@ export async function logTriageSession(sessionData: {
   answers: Record<string, any>;
   outcome: string;
   timestamp: string;
+  condition?: string;
+  compassionateWord?: string;
 }) {
   try {
     const { error } = await supabase
@@ -27,6 +29,33 @@ export async function logTriageSession(sessionData: {
     return true;
   } catch (err) {
     console.error("Failed to log triage session:", err);
+    return false;
+  }
+}
+
+export async function logMentalHealthSession(sessionData: {
+  mood: string;
+  anxiety: string;
+  sleep_issues: string;
+  duration: string;
+  self_harm_thoughts: string;
+  outcome: string;
+  timestamp: string;
+  compassionateWord?: string;
+}) {
+  try {
+    const { error } = await supabase
+      .from('mental_health_sessions')
+      .insert([sessionData]);
+
+    if (error) {
+      console.error("Error logging mental health session:", error);
+      return false;
+    }
+    
+    return true;
+  } catch (err) {
+    console.error("Failed to log mental health session:", err);
     return false;
   }
 }
