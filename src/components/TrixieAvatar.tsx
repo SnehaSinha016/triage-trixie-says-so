@@ -3,9 +3,10 @@ import { useState } from 'react';
 
 type TrixieAvatarProps = {
   size?: 'sm' | 'md' | 'lg';
+  customEmoji?: string;
 };
 
-const TrixieAvatar = ({ size = 'md' }: TrixieAvatarProps) => {
+const TrixieAvatar = ({ size = 'md', customEmoji }: TrixieAvatarProps) => {
   const [isWaving, setIsWaving] = useState(false);
 
   const sizeClasses = {
@@ -25,7 +26,7 @@ const TrixieAvatar = ({ size = 'md' }: TrixieAvatarProps) => {
       onMouseEnter={handleMouseEnter}
     >
       <span className={`text-2xl transition-transform ${isWaving ? 'animate-bounce' : 'animate-float'}`}>
-        {isWaving ? '👋' : '🤖'}
+        {isWaving ? '👋' : customEmoji || '🤖'}
       </span>
     </div>
   );
