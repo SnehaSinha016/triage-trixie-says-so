@@ -13,13 +13,20 @@ import SelfCareTip from '../components/SelfCareTip';
 import CrisisResources from '../components/CrisisResources';
 import SelfCareToolbox from '../components/SelfCareToolbox';
 import MoodJournal from '../components/MoodJournal';
+import HealthTrends from '../components/HealthTrends';
+import PersonalizationModal from '../components/PersonalizationModal';
+import AnonymousModeIndicator from '../components/AnonymousModeIndicator';
+import AvatarSelector from '../components/AvatarSelector';
+import LanguageSelector from '../components/LanguageSelector';
 import { Button } from '@/components/ui/button';
 import { symptoms } from '../data/symptoms';
 import { Question, questionsBySymptom } from '../data/questions';
 import { evaluateTriage, TriageResult } from '../utils/triageLogic';
 import { logTriageSession, logMentalHealthSession } from '../services/supabaseClient';
 import { useToast } from '../hooks/use-toast';
-import { ArrowRight } from 'lucide-react';
+import { usePreferences } from '../hooks/use-preferences';
+import { useHealthTrends } from '../hooks/use-health-trends';
+import { ArrowRight, Settings, ChartLine, Bell } from 'lucide-react';
 import { getRandomCompassionateWord, physicalHealthWords, mentalHealthWords } from '../data/compassionateWords';
 
 type ChatStep = 
@@ -42,8 +49,14 @@ const Index = () => {
   const [showCrisisResources, setShowCrisisResources] = useState(false);
   const [showSelfCareToolbox, setShowSelfCareToolbox] = useState(false);
   const [showMoodJournal, setShowMoodJournal] = useState(false);
+  const [showHealthTrends, setShowHealthTrends] = useState(false);
+  const [showPersonalization, setShowPersonalization] = useState(false);
+  const [currentLanguage, setCurrentLanguage] = useState('en');
   const { toast } = useToast();
-
+  
+  const { preferences, savePreferences, isLoaded: preferencesLoaded } = usePreferences();
+  const { addSymptomEntry, addMoodEntry } = useHealthTrends();
+  
   useEffect(() => {
     if (selectedSymptom) {
       const symptomQuestions = questionsBySymptom[selectedSymptom.id] || [];
@@ -98,31 +111,52 @@ const Index = () => {
           setCurrentStep('outcome');
           setIsThinking(false);
           
-          // Log the session to Supabase
+          // Log the session to localStorage for health trends
+          const timestamp = new Date().toISOString();
+          
           if (selectedSymptom.id === 'mental-health') {
-            logMentalHealthSession({
+            addMoodEntry({
+              timestamp,
               mood: answers['mental-health-mood'] as string,
               anxiety: answers['mental-health-anxiety'] as string,
-              sleep_issues: answers['mental-health-sleep'] as string,
-              duration: answers['mental-health-duration'] as string,
-              self_harm_thoughts: answers['mental-health-thoughts'] as string,
-              outcome: result.outcome,
-              timestamp: new Date().toISOString(),
-              compassionateWord: result.compassionateWord
-            }).catch(err => {
-              console.error("Failed to log mental health session:", err);
+              sleep: answers['mental-health-sleep'] as string,
+              outcome: result.outcome
             });
           } else {
-            logTriageSession({
-              symptom: selectedSymptom.id,
-              answers,
-              outcome: result.outcome,
-              condition: result.condition,
-              compassionateWord: result.compassionateWord,
-              timestamp: new Date().toISOString()
-            }).catch(err => {
-              console.error("Failed to log session:", err);
+            addSymptomEntry({
+              timestamp,
+              symptomId: selectedSymptom.id,
+              outcome: result.outcome
             });
+          }
+          
+          // Only log to Supabase if not in anonymous mode
+          if (!preferences.anonymous) {
+            if (selectedSymptom.id === 'mental-health') {
+              logMentalHealthSession({
+                mood: answers['mental-health-mood'] as string,
+                anxiety: answers['mental-health-anxiety'] as string,
+                sleep_issues: answers['mental-health-sleep'] as string,
+                duration: answers['mental-health-duration'] as string,
+                self_harm_thoughts: answers['mental-health-thoughts'] as string,
+                outcome: result.outcome,
+                timestamp,
+                compassionateWord: result.compassionateWord
+              }).catch(err => {
+                console.error("Failed to log mental health session:", err);
+              });
+            } else {
+              logTriageSession({
+                symptom: selectedSymptom.id,
+                answers,
+                outcome: result.outcome,
+                condition: result.condition,
+                compassionateWord: result.compassionateWord,
+                timestamp
+              }).catch(err => {
+                console.error("Failed to log session:", err);
+              });
+            }
           }
         }
       }, 2000);
@@ -149,14 +183,74 @@ const Index = () => {
     });
   };
 
+  const getAppTitle = () => {
+    switch (preferences.tone) {
+      case 'playful': return 'Trixie the Triage Bot';
+      case 'professional': return 'Health Triage Assistant';
+      case 'gentle': 
+      default: return 'Trixie the Triage Bot';
+    }
+  };
+  
+  const getAvatarEmoji = () => {
+    switch (preferences.avatar) {
+      case 'doctor': return '👩‍⚕️';
+      case 'nurse': return '👨‍⚕️';
+      case 'friend': return '🧸';
+      case 'star': return '✨';
+      case 'heart': return '💖';
+      case 'bot':
+      default: return '🤖';
+    }
+  };
+  
+  if (!preferencesLoaded) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <LoadingDots />
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-50 to-mint/10">
+    <div className={`min-h-screen flex flex-col bg-gradient-to-br from-blue-50 to-mint/10 ${preferences.theme === 'lavender' ? 'theme-lavender' : preferences.theme === 'coral' ? 'theme-coral' : preferences.theme === 'blue' ? 'theme-blue' : preferences.theme === 'sunshine' ? 'theme-sunshine' : ''}`}>
       {/* Header */}
-      <header className="py-4 px-6 flex items-center border-b bg-white/80 backdrop-blur-sm">
-        <TrixieAvatar size="md" />
-        <div className="ml-3">
-          <h1 className="text-xl font-bold">Trixie the Triage Bot</h1>
-          <p className="text-xs text-gray-500">Your friendly symptom checker 🩺</p>
+      <header className="py-4 px-6 flex items-center justify-between border-b bg-white/80 backdrop-blur-sm">
+        <div className="flex items-center">
+          <TrixieAvatar size="md" customEmoji={getAvatarEmoji()} />
+          <div className="ml-3">
+            <h1 className="text-xl font-bold">{getAppTitle()}</h1>
+            <p className="text-xs text-gray-500">Your friendly symptom checker 🩺</p>
+          </div>
+        </div>
+        
+        <div className="flex items-center gap-2">
+          {preferences.anonymous && (
+            <AnonymousModeIndicator />
+          )}
+          
+          <LanguageSelector 
+            onLanguageChange={setCurrentLanguage} 
+            currentLanguage={currentLanguage} 
+          />
+          
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setShowHealthTrends(true)}
+            title="View Health Trends"
+          >
+            <ChartLine size={20} />
+          </Button>
+          
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setShowPersonalization(true)}
+            title="Personalization Settings"
+          >
+            <Settings size={20} />
+          </Button>
         </div>
       </header>
       
@@ -173,9 +267,9 @@ const Index = () => {
               className="flex flex-col items-center text-center"
             >
               <div className="mb-6">
-                <TrixieAvatar size="lg" />
+                <TrixieAvatar size="lg" customEmoji={getAvatarEmoji()} />
               </div>
-              <h1 className="text-3xl font-bold mb-4">Hi there! I'm Trixie 👋</h1>
+              <h1 className="text-3xl font-bold mb-4">Hi there! I'm {preferences.avatar === 'bot' ? 'Trixie' : preferences.avatar === 'doctor' ? 'Dr. Care' : 'your health buddy'} 👋</h1>
               <p className="text-lg mb-6">
                 I'm your friendly triage assistant! Tell me what's bothering you, and I'll help you figure out what to do next.
               </p>
@@ -343,6 +437,18 @@ const Index = () => {
         
         {showMoodJournal && (
           <MoodJournal onClose={() => setShowMoodJournal(false)} />
+        )}
+        
+        {showHealthTrends && (
+          <HealthTrends onClose={() => setShowHealthTrends(false)} />
+        )}
+        
+        {showPersonalization && (
+          <PersonalizationModal 
+            onClose={() => setShowPersonalization(false)} 
+            onSavePreferences={savePreferences}
+            currentPreferences={preferences}
+          />
         )}
       </AnimatePresence>
     </div>
