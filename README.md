@@ -1,73 +1,40 @@
-# Welcome to your Lovable project
+#  Quick Triage Bot (Trixie)
 
-## Project info
+Hi there!  I'm **Trixie**, your friendly AI-powered triage assistant.  
+This application helps users describe their symptoms and get **quick, accessible triage guidance** in a **fun and approachable way** using Generative AI.  
 
-**URL**: https://lovable.dev/projects/2cbf2377-38eb-4d29-a095-afc5c08ab00f
+Built with **Lovable.dev**, **React (Vite + TypeScript)**, **Supabase**, and **OpenAI GPT models**.  
 
-## How can I edit this code?
+---
 
-There are several ways of editing your application.
+##  Features
+-  Symptom-based triage with playful, emoji-driven responses  
+-  Red-flag detection for urgent cases  
+-  Session logging with Supabase  
+-  Clean, mobile-friendly UI with Tailwind + shadcn  
+-  Built and iterated quickly using [Lovable.dev](https://lovable.dev)  
 
-**Use Lovable**
+---
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/2cbf2377-38eb-4d29-a095-afc5c08ab00f) and start prompting.
+##  Tech Stack
+- [Lovable.dev](https://lovable.dev) – AI-powered app builder  
+- [React + Vite + TypeScript](https://vitejs.dev) – Frontend  
+- [shadcn/ui](https://ui.shadcn.com) – UI components  
+- [Tailwind CSS](https://tailwindcss.com) – Styling  
+- [Supabase](https://supabase.com) – Backend & Auth  
+- [OpenAI GPT models](https://platform.openai.com) – Conversational AI  
 
-Changes made via Lovable will be committed automatically to this repo.
+---
+## Install dependencies:
+- npm install
 
-**Use your preferred IDE**
+##  Getting Started
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### Run Locally
+Clone the project:
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+```bash
+git clone https://github.com/SnehaSinha016/triage-trixie-says-so.git
+cd triage-trixie-says-so
 
-Follow these steps:
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
-
-**Edit a file directly in GitHub**
-
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/2cbf2377-38eb-4d29-a095-afc5c08ab00f) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
